@@ -43,7 +43,7 @@ function buttonClick(event){
         case 'negate':
             negate();
             break;
-        case 'mod':
+         case 'mod':
             percentage();
             break;
         case 'decimal':
@@ -58,9 +58,28 @@ function buttonClick(event){
 inputBox.addEventListener('click', buttonClick)
 
 function addValue(value) {
-    //add value to expression
+    if (value === '.'){
+    const lastOperatorIndex = expression.search(/[+\-*/]/);
+    const lastDecimalIndex = expression.lastIndexOf('.');
+    const lastNumberIndex = Math.max(
+    expression.lastIndexOf('+'),
+    expression.lastIndexOf('-'),
+    expression.lastIndexOf('*'),
+    expression.lastIndexOf('/')
+);
+    if (
+        (lastOperatorIndex > lastDecimalIndex ||
+        lastDecimalIndex < lastNumberIndex ||
+        lastDecimalIndex === - 1) &&
+        (expression === '' ||
+            expression.slice(lastNumberIndex + 1).indexOf('-') 
+            === -1)
+            ) {
+        expression += value;
+    }
+  }else {
     expression += value;
-    // console.log(expression);
+  }
 }
 function updateDisplay(expression, result) {
     expressionDiv.textContent = expression;
@@ -101,7 +120,10 @@ function negate(){
         expression = expression.slice(1);
     }
 }
-function percentage(){
+
+
+//alte Prozent-Funktion
+ function percentage(){
     if(expression !==''){
         result = evaluateExpression();
         expression = '';
@@ -114,8 +136,42 @@ function percentage(){
         result = parseFloat(result) / 100;
     }
 }
+
+
+// neue Prozent-Funktion (building...)
+/*function percentage() {
+    if (expression !== '') {
+        
+        let match = expression.match(/(\d+(\.\d+)?)([\+\-\*\/])(\d+(\.\d+)?)%$/);
+        if (match) {
+            let x = parseFloat(match[1]);
+            let y = parseFloat(match[4]);
+            let calculatedResult;
+
+            switch (match[3]) {
+                case '+':
+                    calculatedResult = x + (x * y / 100);
+                    break;
+                case '-':
+                    calculatedResult = x - (x * y / 100);
+                    break;
+                case '*':
+                    calculatedResult = x * (y / 100);
+                    break;
+                case '/':
+                    calculatedResult = x / (y / 100);
+                    break;
+                default:
+                    return;
+            }
+
+            expression = calculatedResult.toString();
+            result = calculatedResult;
+        }
+    }
+}*/
 function decimal(value){
-    if (!expression.endsWith('-') && !isNaN(expression.slice(-1))) {
+    if (!expression.endsWith('.') && !isNaN(expression.slice(-1))) {
         addValue(value);
     }
 }
