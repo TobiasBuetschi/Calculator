@@ -24,8 +24,14 @@ section {
   gap: 15px;
 }
 
+#input {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+
 .btn {
-  flex-basis: calc(25% - 15px);
+  /* flex-basis: calc(25% - 10px); */
   margin: 5px;
   font-size: 32px;
   height: 72px;
