@@ -25,7 +25,7 @@ section {
 }
 
 .btn {
-  flex-basis: calc(25% - 10px);
+  flex-basis: calc(25% - 15px);
   margin: 5px;
   font-size: 32px;
   height: 72px;
