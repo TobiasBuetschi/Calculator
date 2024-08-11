@@ -2,10 +2,10 @@
 const inputBox = document.getElementById('input');
 const expressionDiv = document.getElementById('expression');
 const resultDiv = document.getElementById('result');
-
 //define expression and result variable
 let expression = '';
 let result = '';
+let lastButtonClicked = '';
 
 //Define event handler for button clicks
 function buttonClick(event){
@@ -18,7 +18,12 @@ function buttonClick(event){
    //switch case to control the calculator
    switch (action){
         case 'number':
-            addValue(value);
+            if (expression === '' && result === '') {
+            addValue(value);}
+            else if(expression === '' && result!== ''){}
+            else{
+                addValue(value);
+            }
             break;
         case 'clear':
             clear();
@@ -31,7 +36,9 @@ function buttonClick(event){
         case 'subtraction':
         case 'multiplication':
         case 'division':
-            if(expression === '' && result !== ''){
+            if(expression !== '' && result === ''){
+                startFromExpression(value);
+            }else if(expression === '' && result !== ''){
                 startFromResult(value);
             }else if(expression !== '' && !isLastCharOperator()) {
                 addValue(value);
@@ -50,9 +57,17 @@ function buttonClick(event){
             decimal(value);
             break;
    }
-
+   getLastButtonClick(action);
    //update display
    updateDisplay(expression, result);
+}
+function getLastButtonClick(button) {
+    if(button=== 'addition' || 
+        button ==='subtraction' ||
+        button ==='multiplication' || 
+        button === 'division'){
+            lastButtonClicked = button;
+    } 
 }
 
 inputBox.addEventListener('click', buttonClick)
@@ -88,6 +103,7 @@ function updateDisplay(expression, result) {
 function clear() {
     expression= '';
     result= '';
+    operator= '';
 }
 function backspace() {
     expression = expression.slice(0,-1)
@@ -95,15 +111,20 @@ function backspace() {
 function isLastCharOperator() {
     return isNaN(parseInt(expression.slice(-1)));
 }
+function startFromExpression(value) {
+    result = expression;
+    expression = value;
+}
 function startFromResult(value) {
-    expression +=result + value;
+    expression = value;
 }
 function submit(){
     result = evaluateExpression();
     expression = '';
 }
 function evaluateExpression(){
-    const evalResult = eval(expression);
+    
+    const evalResult = eval(result + expression);
     return isNaN(evalResult) || !isFinite(evalResult)
     ? ' '
     : evalResult < 1
@@ -123,7 +144,7 @@ function negate(){
 
 
 //alte Prozent-Funktion
- function percentage(){
+ /*function percentage(){
     if(expression !==''){
         result = evaluateExpression();
         expression = '';
@@ -135,41 +156,39 @@ function negate(){
     } else if (result !== ''){
         result = parseFloat(result) / 100;
     }
+}*/
+
+
+// neue Prozent-Funktion
+function percentage() {
+    const cleanedMultiplication = expression.replace('*', '');
+    const cleanedDivision = expression.replace('/', '');
+
+
+    if (lastButtonClicked === 'addition' || lastButtonClicked === 'subtraction'){
+        let getPercentagefromResult = result * expression / 100;        
+        expression = getPercentagefromResult;
+        let plus = '+';
+        if (expression >= 0){
+        expression = plus + expression;
+        }
+    }else if (lastButtonClicked ==='multiplication' ){
+        let percentageMultiplication = cleanedMultiplication / 100;        
+        expression = percentageMultiplication;
+        let multiply = '*';
+        if (expression >= 0){
+        expression = multiply + expression;
+        }
+    }else if (lastButtonClicked === 'division'){
+        let percentageDivision = cleanedDivision / 100;        
+        expression = percentageDivision;
+        let divide = '/';
+        if (expression >= 0){
+        expression = divide + expression;
+        }
+        }
 }
 
-
-// neue Prozent-Funktion (building...)
-/*function percentage() {
-    if (expression !== '') {
-        
-        let match = expression.match(/(\d+(\.\d+)?)([\+\-\*\/])(\d+(\.\d+)?)%$/);
-        if (match) {
-            let x = parseFloat(match[1]);
-            let y = parseFloat(match[4]);
-            let calculatedResult;
-
-            switch (match[3]) {
-                case '+':
-                    calculatedResult = x + (x * y / 100);
-                    break;
-                case '-':
-                    calculatedResult = x - (x * y / 100);
-                    break;
-                case '*':
-                    calculatedResult = x * (y / 100);
-                    break;
-                case '/':
-                    calculatedResult = x / (y / 100);
-                    break;
-                default:
-                    return;
-            }
-
-            expression = calculatedResult.toString();
-            result = calculatedResult;
-        }
-    }
-}*/
 function decimal(value){
     if (!expression.endsWith('.') && !isNaN(expression.slice(-1))) {
         addValue(value);
